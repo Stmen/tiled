@@ -24,6 +24,7 @@
 
 #include <QHash>
 #include <QObject>
+#include <QVector>
 
 #include <memory>
 
