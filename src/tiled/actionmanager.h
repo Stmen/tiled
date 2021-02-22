@@ -25,6 +25,8 @@
 #include <QHash>
 #include <QObject>
 
+#include <memory>
+
 class QAction;
 class QMenu;
 
@@ -43,6 +45,16 @@ class ActionManager : public QObject
     ~ActionManager();
 
 public:
+    struct MenuItem {
+        Id action;
+        Id beforeAction;
+        bool isSeparator;
+    };
+
+    struct MenuExtension {
+        QVector<MenuItem> items;
+    };
+
     static ActionManager *instance();
 
     static void registerAction(QAction *action, Id id);
@@ -51,11 +63,14 @@ public:
     static void registerMenu(QMenu *menu, Id id);
     static void unregisterMenu(Id id);
 
+    static void registerMenuExtension(Id id, MenuExtension extension);
+    static void applyMenuExtensions(QMenu *menu, Id id);
+    static void clearMenuExtensions();
+
     static QAction *action(Id id);
     static QAction *findAction(Id id);
 
-    static QMenu *menu(Id id);
-    static QMenu *findMenu(Id id);
+    static bool hasMenu(Id id);
 
     static QList<Id> actions();
     static QList<Id> menus();
@@ -76,9 +91,12 @@ private:
     void readCustomShortcuts();
     void applyShortcut(QAction *action, const QKeySequence &shortcut);
     void updateToolTipWithShortcut(QAction *action);
+    void applyMenuExtension(QMenu *menu, const MenuExtension &extension);
 
     QMultiHash<Id, QAction*> mIdToActions;
     QHash<Id, QMenu*> mIdToMenu;
+    QHash<Id, QVector<MenuExtension>> mIdToMenuExtensions;
+    std::unique_ptr<QObject> mMenuSeparatorsParent;
 
     QHash<Id, QKeySequence> mDefaultShortcuts;      // for resetting to default
     QHash<Id, QKeySequence> mCustomShortcuts;

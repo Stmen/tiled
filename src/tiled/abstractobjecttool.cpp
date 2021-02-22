@@ -718,6 +718,8 @@ void AbstractObjectTool::showContextMenu(MapObject *clickedObject,
     Utils::setThemeIcon(removeAction, "edit-delete");
     Utils::setThemeIcon(propertiesAction, "document-properties");
 
+    ActionManager::applyMenuExtensions(&menu, "MapView.Objects");
+
     QAction *action = menu.exec(screenPos);
     if (!action)
         return;
